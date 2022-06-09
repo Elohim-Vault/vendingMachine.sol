@@ -24,19 +24,19 @@ describe("VendingMachine", function () {
             .revertedWith("Only owner should do this.");
     })
 
-    it("Should sell a product.", async () => {
+    it("Should buy a product.", async () => {
         await expect(vending.add("Sprite Soda", 2))
             .to
             .emit(vending, "added");
 
-        await expect(vending.sell(1, 1, {value: ethers.utils.parseEther("1.0")}))
+        await expect(vending.buy(1, 1, {value: ethers.utils.parseUnits("3", "wei")}))
             .to
             .be
             .emit(vending, "sold");
     });
 
     it("Should revert with not found when try to buy a non-existent product.", async () => {
-        await expect(vending.sell(42, 1))
+        await expect(vending.buy(42, 1))
             .to
             .be
             .revertedWith("Product not found.");
@@ -47,9 +47,20 @@ describe("VendingMachine", function () {
         .to
         .emit(vending, "added");
 
-        await expect(vending.sell(1, 6))
+        await expect(vending.buy(1, 6))
             .to
             .be
             .revertedWith("Try to buy more then available.");
+    });
+
+    it("Should revert when send less wei then product price.", async () => {
+        await expect(vending.add("Sprite Soda", 2))
+        .to
+        .emit(vending, "added");
+
+    await expect(vending.buy(1, 1, {value: ethers.utils.parseUnits("1", "wei")}))
+        .to
+        .be
+        .revertedWith("Incorret wei value sent.");
     })
 })
