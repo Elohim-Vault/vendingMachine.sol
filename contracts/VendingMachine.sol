@@ -4,8 +4,9 @@ pragma solidity ^0.8.0;
 import "hardhat/console.sol";
 
 contract VendingMachine {
-    uint totalProducts;
-    address private owner;
+    uint private totalProducts;
+    uint private totalWei;
+    address payable private owner;
     Product[] public repository;
 
     struct Product {
@@ -24,8 +25,9 @@ contract VendingMachine {
     }
 
     constructor() {
-        owner = msg.sender;
+        owner = payable(msg.sender);
         totalProducts = 0;
+        totalWei = 0;
     }
 
     function add(string calldata name, uint price) public OnlyOwner {
@@ -35,11 +37,13 @@ contract VendingMachine {
         emit added(name);
     }
 
-    function sell(uint id, uint amount) public {
+    function sell(uint id, uint amount) public payable {
         for (uint i = 0; i < repository.length; i++) {
             Product memory product = repository[i];
             if (product.id == id) {
                 require(amount <= product.quantity, "Try to buy more then available.");
+                owner.transfer(product.price);
+                totalWei += amount;
                 repository[i].quantity -= amount;
                 emit sold(product.name, amount, msg.sender);
                 return ;

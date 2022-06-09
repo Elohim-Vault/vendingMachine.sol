@@ -29,7 +29,7 @@ describe("VendingMachine", function () {
             .to
             .emit(vending, "added");
 
-        await expect(vending.sell(1, 1))
+        await expect(vending.sell(1, 1, {value: ethers.utils.parseEther("1.0")}))
             .to
             .be
             .emit(vending, "sold");
@@ -46,7 +46,7 @@ describe("VendingMachine", function () {
         await expect(vending.add("Sprite Soda", 2))
         .to
         .emit(vending, "added");
-        
+
         await expect(vending.sell(1, 6))
             .to
             .be
